@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Scalar.AspNetCore;
+using System.Reflection;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.AddSwaggerGen();
 builder.Services.AddOpenApi();
 
 // JWT Token Configuration
@@ -39,6 +42,16 @@ builder.Services.AddSwaggerGen(option =>
         Title = "Git Tagging and Release Process API",
         Description = "Git Tagging and Release Process .NET 8 Core Web API"
     });
+
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+
+    if (File.Exists(xmlPath))
+    {
+        option.IncludeXmlComments(xmlPath);
+    }
+    option.EnableAnnotations();
+
     option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Authorization header using the Bearer scheme (Example: 'Bearer 12345abcdef')",
@@ -66,14 +79,22 @@ builder.Services.AddSwaggerGen(option =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+app.UseSwagger(opt =>
 {
-    app.MapOpenApi();
-}
+    opt.RouteTemplate = "openapi/{documentName}.json";
+});
 
-app.UseSwagger();
+app.MapScalarApiReference(opt =>
+{
+    opt.WithTheme(ScalarTheme.DeepSpace)
+       .WithTitle("Git Tagging and Release Process APIs")
+       .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
+});
+
 app.UseSwaggerUI(options => options.SwaggerEndpoint("/swagger/v1/swagger.json", "Git Tagging and Release Process Web Api"));
+app.UseSwagger();
+
+app.MapOpenApi();
 
 app.UseHttpsRedirection();
 
