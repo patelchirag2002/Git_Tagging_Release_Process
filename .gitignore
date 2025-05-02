@@ -1,0 +1,8 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+
+/Git_Tagging_Release_Process.API/bin
+/Git_Tagging_Release_Process.API/obj

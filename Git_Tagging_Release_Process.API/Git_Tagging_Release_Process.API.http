@@ -1,0 +1,6 @@
+@Git_Tagging_Release_Process.API_HostAddress = http://localhost:5264
+
+GET {{Git_Tagging_Release_Process.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
